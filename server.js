@@ -5,7 +5,12 @@ var connect = require('connect'),
     port = (process.env.PORT || 2222),
     http = require('http'),
     xml2js = require('xml2js'),
-    parser = new xml2js.Parser();
+    fs = require('fs'),
+    parser = new xml2js.Parser(),
+    dateFormat = require('dateformat');
+
+var API_KEY = 'WZIYHCMDQIQBMTBOGOZYMCOGOWCXPPMHMIAELCTNMWWVPCVTWC';
+var TODAY = new Date;
 
 //Setup Express
 var server = express.createServer();
@@ -26,24 +31,52 @@ server.error(function(err, req, res, next){
 server.listen(port);
 
 /* ROUTES */
- 
-server.get('/', function(req,res){
-  res.sendfile('index.html', {root: __dirname })
-});
 
-server.get('/api/getLiveScore', function(req,response){ 
-
-  http.get('http://www.xmlsoccer.com/FootballDataDemo.asmx/GetLiveScore?ApiKey=WZIYHCMDQIQBMTBOGOZYMCOGOWCXPPMHMIAELCTNMWWVPCVTWC', function(res) {
+var apiCall = function(filename, url, response){
+    http.get(url+'&ApiKey='+API_KEY, function(res) {
       var body = '';
       res.on('data', function(d) {
           body += d;
       });
       res.on('end', function() {
         parser.parseString(body, function (err, result) {
-          response.send(result['XMLSOCCER.COM'].Match);
+            if(result['XMLSOCCER.COM'].AccountInformation){
+                fs.writeFile('cache/'+filename, JSON.stringify(result["XMLSOCCER.COM"]));
+                response.send(result["XMLSOCCER.COM"]);
+            }
+            else{
+                fs.readFile('cache/'+filename, function (err, data) {
+                    response.send(JSON.parse(data));
+                });
+            }
         });
-      });
+    });
   });
+
+};
+
+
+server.get('/', function(req,res){
+
+    res.sendfile('index.html', {root: __dirname });
+
+});
+
+server.get('/api/getLeagues', function(req,response){
+    
+    apiCall('leagues.json', 'http://www.xmlsoccer.com/FootballData.asmx/GetAllLeagues?i=0', response);
+
+});
+
+server.get('/api/getFixtures/:id', function(req,response){
+
+    apiCall('fixtures'+req.params.id+'.json', 'http://www.xmlsoccer.com/FootballData.asmx/GetFixturesByDateIntervalAndLeague?startDateString='+dateFormat(TODAY, 'mm/dd/yyyy 00:00:00')+'&endDateString='+dateFormat(TODAY, 'mm/dd/yyyy 23:00:00')+'&league='+req.params.id, response);
+
+}); 
+
+server.get('/api/getLiveScores/:id', function(req,response){
+
+    apiCall('live'+req.params.id+'.json', 'http://www.xmlsoccer.com/FootballData.asmx/GetLiveScoreByLeague?league='+req.params.id, response);
     
 }); 
 

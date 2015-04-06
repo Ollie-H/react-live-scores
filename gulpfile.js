@@ -33,8 +33,7 @@ gulp.task('scripts', function() {
 gulp.task('watch', function () {
     livereload.listen();
     gulp.watch(['./static/sass/**/*.scss', './static/sass/*.scss'], ['styles']);
-    gulp.watch(['./static/js/*.js', './static/js/**/*.js'], ['scripts']);
-    gulp.watch('./static/js/**/*.js', ['scripts']);
+    gulp.watch(['./static/js/*.js', './static/js/**/*.js', './static/js/**/*.jsx'], ['scripts']);
 });
 
 gulp.task('default', ['styles', 'scripts', 'watch']);

@@ -1,7 +1,14 @@
-var $ = window.$ = require('./vendor/jquery');
-var _  = window._ = require('./vendor/underscore');
-var React = window.React = window.React = require('react');
-var config = window.config = require('./config/config');
-var Home = require('./components/home.jsx');
+window.$ = require('./vendor/jquery');
+window._ = require('./vendor/underscore');
+window.React = window.React = require('./vendor/react');
+window.config = require('./config/config');
+var App = require('./components/app.jsx');;
 
-React.render(<Home />, document.body);        
+$(document).ready(function(){   
+  
+  React.render(
+    <App />, 
+    document.getElementById('app')
+  );    
+
+});   

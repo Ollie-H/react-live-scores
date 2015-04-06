@@ -1,4 +1,6 @@
 module.exports = {
-	'LIVE_SCORES_URL': '/api/getLiveScore',
+	'LEAGUES_URL': '/api/getLeagues',
+	'FIXTURES_URL': '/api/getFixtures',
+	'LIVE_URL': '/api/getLiveScores',
 	'API_TOKEN' : 'WZIYHCMDQIQBMTBOGOZYMCOGOWCXPPMHMIAELCTNMWWVPCVTWC'
-};
+}; 
